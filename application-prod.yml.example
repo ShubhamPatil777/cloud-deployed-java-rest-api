@@ -1,0 +1,46 @@
+# Production profile example for PostgreSQL.
+#
+# This file is NOT loaded by Spring Boot. Copy it to one of these locations
+# and start the application with SPRING_PROFILES_ACTIVE=prod:
+#
+#   src/main/resources/application-prod.yml
+#   ./config/application-prod.yml
+#
+# Do not commit the copied file if it is ever edited to contain a real password.
+# Supply DATABASE_PASSWORD through the environment. There is no default.
+#
+# The default application uses an in-memory H2 database so local development
+# and the Docker demo start with no external database. See README.md.
+#
+# ddl-auto is update so a fresh PostgreSQL database can start without a
+# migration tool. Replace this with Flyway or Liquibase and ddl-auto: validate
+# before treating the database as durable production data.
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/taskdb}
+    username: ${DATABASE_USERNAME:taskapi}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  h2:
+    console:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never

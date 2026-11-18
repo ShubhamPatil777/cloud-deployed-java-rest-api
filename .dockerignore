@@ -1,0 +1,15 @@
+target/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
+*.md
+docs/
+postman/
+scripts/
+.env
+*.env
+application-prod.yml
+src/main/resources/application-prod.yml
+config/

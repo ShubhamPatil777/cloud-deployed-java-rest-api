@@ -1,0 +1,61 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: cloud-task-api
+  datasource:
+    url: jdbc:h2:mem:taskdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+  h2:
+    console:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  info:
+    build:
+      enabled: true
+
+info:
+  app:
+    name: ${app.api.name}
+    description: ${app.api.description}
+    version: ${app.api.version}
+
+app:
+  api:
+    name: Cloud Task API
+    description: Task management REST API demonstrating a Spring Boot, Docker, and CI/CD lifecycle.
+    version: 1.0.0
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+logging:
+  level:
+    root: INFO
+    com.shubham.cloudapi: INFO

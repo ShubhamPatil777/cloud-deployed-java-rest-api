@@ -1,0 +1,160 @@
+{
+  "info": {
+    "name": "Cloud Task API",
+    "description": "Task management REST API. Set the collection variable baseUrl (default http://localhost:8080) before sending requests. Create Task saves the new id into taskId for the follow-up requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "taskId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "API Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/info",
+        "description": "Returns the application name, description, and API version. Expected status: 200."
+      },
+      "response": []
+    },
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/actuator/health",
+        "description": "Spring Boot Actuator health. Expected body contains status UP and HTTP 200. Component details are hidden."
+      },
+      "response": []
+    },
+    {
+      "name": "Create Task",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 201) {",
+              "  const body = pm.response.json();",
+              "  pm.collectionVariables.set('taskId', String(body.id));",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Write deployment notes\",\n  \"description\": \"Document the Ubuntu VM rollout\",\n  \"status\": \"PENDING\",\n  \"priority\": \"HIGH\"\n}"
+        },
+        "url": "{{baseUrl}}/api/tasks",
+        "description": "Creates a task. Expected status: 201. Location header points at the new task. status must be PENDING, IN_PROGRESS, or COMPLETED. priority must be LOW, MEDIUM, or HIGH. title is required."
+      },
+      "response": []
+    },
+    {
+      "name": "Create Task - validation error",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \" \",\n  \"description\": \"Missing required fields\"\n}"
+        },
+        "url": "{{baseUrl}}/api/tasks",
+        "description": "Blank title and missing status and priority. Expected status: 400 with fieldErrors. The body never includes a stack trace."
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Tasks",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/tasks",
+        "description": "Returns every task, newest first. Expected status: 200 and a JSON array."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Task By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/tasks/{{taskId}}",
+        "description": "Returns one task. Expected status: 200, or 404 when the id does not exist, or 400 when the id is not a number."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Missing Task",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/tasks/999999",
+        "description": "Expected status: 404 and a JSON error with message 'Task not found with id 999999'."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Task",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Write deployment notes\",\n  \"description\": \"Notes reviewed and published\",\n  \"status\": \"COMPLETED\",\n  \"priority\": \"MEDIUM\"\n}"
+        },
+        "url": "{{baseUrl}}/api/tasks/{{taskId}}",
+        "description": "Replaces title, description, status, and priority. Expected status: 200. createdAt stays the same and updatedAt changes. Unknown id returns 404."
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Tasks By Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/tasks/status/PENDING",
+        "description": "Replace PENDING with IN_PROGRESS or COMPLETED. Any other value returns 400."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/tasks/{{taskId}}",
+        "description": "Deletes the task. Expected status: 204 with an empty body. A second delete of the same id returns 404."
+      },
+      "response": []
+    }
+  ]
+}
